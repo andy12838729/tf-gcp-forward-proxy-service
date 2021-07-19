@@ -54,11 +54,6 @@ resource "time_sleep" "wait_60_seconds" {
   create_duration = "60s"
 }
 
-data "google_compute_instance_group" "all" {
-    name = module.mig.name
-    zone = "us-central1-a"
-    depends_on = [module.mig]
-}
 resource "null_resource" "get_forward_proxy_instance_name" {
   triggers = {
     always = timestamp()
