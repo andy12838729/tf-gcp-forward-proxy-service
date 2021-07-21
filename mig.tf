@@ -49,6 +49,11 @@ module "mig" {
 
 }
 
+resource "time_sleep" "wait_60_seconds" {
+  depends_on = [module.mig]
+  create_duration = "60s"
+}
+
 resource "null_resource" "get_forward_proxy_instance_name" {
   triggers = {
     always = timestamp()
@@ -56,7 +61,7 @@ resource "null_resource" "get_forward_proxy_instance_name" {
   provisioner "local-exec" {
     command = "gcloud compute instances list --filter=\"name~'forward-proxy-*'\" --format=\"value(name)\" | tr -d '\n' >> ${path.module}/forward_proxy_instance_name.txt"
   }
-  depends_on = [module.mig]
+  depends_on = [time_sleep.wait_60_seconds]
 }
 
 resource "null_resource" "get_forward_proxy_instance_zone" {
@@ -66,7 +71,7 @@ resource "null_resource" "get_forward_proxy_instance_zone" {
   provisioner "local-exec" {
     command = "gcloud compute instances list --filter=\"name~'forward-proxy-*'\" --format=\"value(zone)\" | tr -d '\n' >> ${path.module}/forward_proxy_instance_zone.txt"
   }
-  depends_on = [module.mig]
+  depends_on = [time_sleep.wait_60_seconds]
 }
 
 data "local_file" "get_forward_proxy_instance_name" {
